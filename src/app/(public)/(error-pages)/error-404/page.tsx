@@ -5,12 +5,6 @@ import React from "react";
 
 import GridShape from "@/components/common/GridShape";
 
-export const metadata: Metadata = {
-  title: "Next.js Error 404 | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Error 404 page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
-
 export default function Error404() {
   return (
     <div className="relative z-1 flex min-h-screen flex-col items-center justify-center overflow-hidden p-6">

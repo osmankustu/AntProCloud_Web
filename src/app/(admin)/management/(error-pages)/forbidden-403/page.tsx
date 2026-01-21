@@ -5,11 +5,6 @@ import React from "react";
 
 import GridShape from "@/components/common/GridShape";
 
-export const metadata: Metadata = {
-  title: "Next.js Error 403 | Cloud Core",
-  description: "This is Next.js Error 403 page for Cloud Core Management ",
-};
-
 export default function Error403() {
   return (
     <div className="relative z-1 flex min-h-screen flex-col items-center justify-center overflow-hidden p-6">
