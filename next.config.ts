@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "s3.eu-central-003.backblazeb2.com",
       },
-      
+
       {
         protocol: "http",
         hostname: "localhost",
@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+  turbopack: {},
 };
 
 export default nextConfig;
