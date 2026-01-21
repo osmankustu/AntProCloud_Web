@@ -1,0 +1,224 @@
+import React, { useEffect } from "react";
+
+import Button from "@/components/ui/button/Button";
+import { Modal } from "@/components/ui/modal";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
+import { useModal } from "@/core/hooks/useModal";
+import { useRequestAction } from "@/core/hooks/useRequestAction";
+import { formatDate } from "@/core/utils/formatter/dateFormater";
+import { showSuccess } from "@/core/utils/toast/toastHelper";
+
+import ActivityDocumentModal from "../../../document/components/modals/DocumentByActivityModal";
+import RecordDocumentModal from "../../../document/components/modals/DocumentByServiceModal";
+import { DeleteActivity } from "../../service/ActivityService";
+import { useActivityStore } from "../../store/useActivityStore";
+import ActivityAddForm from "../forms/ActivityAddForm";
+import ActivityEditForm from "../forms/ActivityEditForm";
+import CardDeleteButton from "@/components/ui/button/CardDeleteButton";
+import { usePermission } from "@/core/hooks/auth/usePermission";
+import activityPermissions from "../../constants/activityPermissions.const";
+import TableAddButton from "@/components/ui/button/TableAddButton";
+import documentPermissions from "@/modules/SMM/document/constants/documentPermissions.const";
+import { ServiceModel } from "@/modules/SMM/service/model/Service";
+import ServiceStatusTableIndicator from "@/modules/SMM/service/components/indicators/ServiceStatusTableIndicator";
+import { usePersonelStore } from "@/modules/WFM/employee/store/usePersonelStore";
+
+const ServiceActivityTable = ({ service }: { service: ServiceModel }) => {
+  const { isOpen, openModal, closeModal } = useModal();
+  const { poolActivities, fetchPoolActivities } = useActivityStore();
+  const { personelOptions, fetchPersonelOptions } = usePersonelStore();
+  const { run } = useRequestAction();
+  const { hasPermission } = usePermission();
+  useEffect(() => {
+    fetchPersonelOptions();
+    if (service) {
+      run(async () => {
+        fetchPoolActivities(service.poolId);
+      });
+    }
+  }, []);
+
+  const joinedActivities = poolActivities?.items.map(activity => {
+    const personel = personelOptions?.items.find(p => p.id === activity.employeeId);
+    return {
+      ...activity,
+      fullName: personel?.firstName + " " + personel?.lastName,
+    };
+  });
+
+  const handleDelete = async (activityId: string) => {
+    try {
+      const response = await DeleteActivity(activityId);
+      if (response.status === 200) {
+        showSuccess("silindi");
+        fetchPoolActivities(service.poolId);
+      }
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  };
+
+  return (
+    <>
+      <div className="mt-5 overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-50">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Servis Aktiviteleri
+            </h3>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {hasPermission(documentPermissions.read) ||
+            hasPermission(documentPermissions.allPermissions) ? (
+              <RecordDocumentModal
+                service={service}
+                className="text-theme-sm shadow-theme-xs inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                text="Tüm Dökümanları Görüntüle"
+              />
+            ) : null}
+
+            {hasPermission(activityPermissions.create) ||
+            hasPermission(activityPermissions.allPermissions) ? (
+              <TableAddButton text="Aktivite Oluştur" onClick={openModal} />
+            ) : null}
+          </div>
+        </div>
+
+        <div className="max-w-full overflow-x-auto">
+          <Table>
+            {/* Table Header */}
+            <TableHeader className="border-y border-gray-100 dark:border-gray-800">
+              <TableRow>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                >
+                  ID
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Personel
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Notlar
+                </TableCell>
+
+                <TableCell
+                  isHeader
+                  className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Durum Güncellemesi
+                </TableCell>
+                {hasPermission(documentPermissions.read) ||
+                hasPermission(documentPermissions.allPermissions) ? (
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Dökümanlar
+                  </TableCell>
+                ) : null}
+
+                <TableCell
+                  isHeader
+                  className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Tarih
+                </TableCell>
+
+                {hasPermission(activityPermissions.update) ||
+                hasPermission(activityPermissions.allPermissions) ? (
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    İşlemler
+                  </TableCell>
+                ) : null}
+              </TableRow>
+            </TableHeader>
+
+            {/* Table Body */}
+
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {joinedActivities?.map((activity, index) => (
+                <TableRow key={index} className="">
+                  <TableCell className="py-3">
+                    <div className="flex items-center gap-3">
+                      <p className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                        {"SA-2512C59F-2750"}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-theme-sm py-3 text-gray-500 dark:text-gray-400">
+                    {activity.employeeId ? activity.fullName : "*"}
+                  </TableCell>
+                  <TableCell className="text-theme-sm py-3 text-gray-500 dark:text-gray-400">
+                    {activity.description}
+                  </TableCell>
+                  <TableCell className="text-theme-sm py-2 text-gray-500 dark:text-white">
+                    <ServiceStatusTableIndicator
+                      id={activity.id}
+                      key={activity.id}
+                      serviceStatus={activity.status}
+                    />
+                  </TableCell>
+
+                  {hasPermission(documentPermissions.read) ||
+                  hasPermission(documentPermissions.allPermissions) ? (
+                    <TableCell className="text-theme-sm py-3 text-gray-500 dark:text-gray-400">
+                      {
+                        <ActivityDocumentModal
+                          className="text-theme-sm shadow-theme-xs inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                          text="Görüntüle"
+                          activity={activity}
+                        />
+                      }
+                    </TableCell>
+                  ) : null}
+
+                  <TableCell className="text-theme-sm py-3 text-gray-500 dark:text-gray-400">
+                    {formatDate(activity.createdDate)}
+                  </TableCell>
+                  <TableCell className="text-theme-sm py-3 text-gray-500 dark:text-gray-400">
+                    {activity.employeeId !== null ? (
+                      <div className="flex items-baseline gap-2">
+                        {hasPermission(activityPermissions.delete) ||
+                        hasPermission(activityPermissions.allPermissions) ? (
+                          <CardDeleteButton onClick={() => handleDelete(activity.id)} text="Sil" />
+                        ) : null}
+
+                        {hasPermission(activityPermissions.update) ||
+                        hasPermission(activityPermissions.allPermissions) ? (
+                          <ActivityEditForm
+                            key={activity.id}
+                            activityId={activity.id}
+                            text="Güncelle"
+                          />
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div>*</div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <Modal mode="wait" isOpen={isOpen} onClose={closeModal} className="m-4 max-w-[900px]">
+        <ActivityAddForm service={service} isOpen={isOpen} onClose={closeModal} />
+      </Modal>
+    </>
+  );
+};
+
+export default ServiceActivityTable;
