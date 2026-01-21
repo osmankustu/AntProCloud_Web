@@ -11,8 +11,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --ci ",
-    "build:prod": "NODE_ENV=production next build",
-    "start:prod": "NODE_ENV=production next start -p $PORT"
+    "build:prod": "NODE_ENV=production npx next build",
+    "start:prod": "NODE_ENV=production npx next start -p $PORT"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
