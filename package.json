@@ -4,15 +4,15 @@
     "dev": "next dev",
     "build": "next build",
     "build:staging": "cross-env NODE_ENV=staging next build",
-    "build:prod": "cross-env NODE_ENV=production next build",
     "start:dev": "cross-env NODE_ENV=development next start",
     "start:staging": "cross-env NODE_ENV=staging next start",
-    "start:prod": "cross-env NODE_ENV=production next start",
     "lint": "next lint",
     "lint:ci": "eslint 'src/**/*.{js,ts,tsx}' -f node_modules/eslint-formatter-html -o lint-results.html || true",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --ci "
+    "test:coverage": "jest --ci ",
+    "build:prod": "NODE_ENV=production next build",
+    "start:prod": "NODE_ENV=production next start -p $PORT"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
