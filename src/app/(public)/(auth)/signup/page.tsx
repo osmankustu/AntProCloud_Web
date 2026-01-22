@@ -1,3 +1,4 @@
+"use client";
 import { Metadata } from "next";
 
 import SignUpForm from "@/modules/IAM/auth/components/SignUpForm";
