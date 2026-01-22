@@ -11,7 +11,7 @@ type FailedRequest = {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "/api/proxy", // Buraya API'nizin base URL'ini koymalısınız
+  baseURL: "https://antprocloud.onrender.com/api/v1", // Buraya API'nizin base URL'ini koymalısınız
   //timeout: 10000,                      // API'ye yapılacak istekler için timeout süresi (10 saniye)
 });
 
