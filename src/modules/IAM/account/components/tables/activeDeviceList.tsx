@@ -1,3 +1,4 @@
+"use Client";
 import Button from "@/components/ui/button/Button";
 import TableOffButton from "@/components/ui/button/TableOffButton";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";

@@ -46,7 +46,5 @@ export default function AccountLayout() {
         </div>
       </div>
     </div>
-
-
   );
 }

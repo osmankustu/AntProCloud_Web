@@ -1,4 +1,5 @@
 // components/account/Sidebar.tsx
+"use client";
 type SidebarProps = {
   items: { id: string; label: string }[];
   activeTab: string;
